@@ -11,9 +11,8 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    dateNow = new Date();
     dateFuture = selectedDates[0];
-    makeMessage(selectedDates[0] > dateNow);
+    makeMessage(!endTime());
   },
 };
 function dateDiff() {
@@ -23,20 +22,23 @@ function dateDiff() {
 function btnStartToggleDis(bool) {
   btnStartRef.disabled = bool ? false : true;
 }
-function makeMessage(bool) {
-  bool
-    ? btnStartToggleDis(bool)
-    : Notiflix.Notify.failure('Please choose a date in the future');
+function timerStartSettings() {
+  btnStartToggleDis(true)
+  clearInterval(timerId)
+  dataSet({});
 }
-const inDataTimeRef = document.querySelector('#datetime-picker');
-const daysSpanRef = document.querySelector('[data-days]');
-const hoursSpanRef = document.querySelector('[data-hours]');
-const minutesSpanRef = document.querySelector('[data-minutes]');
-const secondsSpanRef = document.querySelector('[data-seconds]');
-const btnStartRef = document.querySelector('[data-start]');
+function endTime(){
+return dateFuture<=new Date();
+}
+function makeMessage(bool) {
+  if (bool) 
+    {timerStartSettings()}
+    else
+    { Notiflix.Notify.failure('Please choose a date in the future');
+    btnStartToggleDis(false)
+  }
+}
 
-flatpickr(inDataTimeRef, options);
-btnStartToggleDis(false);
 function convertMs(ms) {
   const second = 1000;
   const minute = second * 60;
@@ -48,15 +50,34 @@ function convertMs(ms) {
   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
   return { days, hours, minutes, seconds };
 }
-function dataSet({ days, hours, minutes, seconds }) {
+function addLeadingZero(value=""){
+  return value.padStart(2,"0")
+}
+function dataSet({ days="00", hours="00", minutes="00", seconds="00" }) {
   daysSpanRef.textContent = days;
   hoursSpanRef.textContent = hours;
   minutesSpanRef.textContent = minutes;
   secondsSpanRef.textContent = seconds;
 }
+
+const inDataTimeRef = document.querySelector('#datetime-picker');
+const daysSpanRef = document.querySelector('[data-days]');
+const hoursSpanRef = document.querySelector('[data-hours]');
+const minutesSpanRef = document.querySelector('[data-minutes]');
+const secondsSpanRef = document.querySelector('[data-seconds]');
+const btnStartRef = document.querySelector('[data-start]');
+
+flatpickr(inDataTimeRef, options);
+btnStartToggleDis(false);
+
+
 btnStartRef.addEventListener('click', () => {
   dataSet(dateDiff());
   timerId = setInterval(() => {
-    dataSet(dateDiff());
+
+   if (endTime()) {timerStartSettings()
+    Notiflix.Notify.success('Timer end');
+  }
+   else {dataSet(dateDiff());}
   }, 1000);
 });

@@ -16,7 +16,11 @@ img {
   display: block;
   max-width: 100%;
 }
+input{ margin-left: 140px;}
+
 .timer {
+  margin-top: 50px;
+  margin-left: 50px;
   display: flex;
 }
 .field {
@@ -27,4 +31,7 @@ img {
   text-align: center;
   display: flex;
   flex-direction: column-reverse;
+}
+.field + .field{
+margin-left: 5px;
 }
